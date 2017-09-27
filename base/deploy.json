@@ -1,0 +1,105 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sku": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    "env": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "staging",
+        "prod"
+      ]
+    }
+  },
+  "variables": {
+    "prefix": "tra",
+    "webSiteBackName": "[Concat(variables('prefix'), '-back-', parameters('env'))]",
+    "webSiteFrontName": "[Concat(variables('prefix'), '-front-', parameters('env'))]",
+    "spBackName": "[Concat(variables('prefix'), '-back-sp-', parameters('env'))]",
+    "spFrontName": "[Concat(variables('prefix'), '-front-sp-', parameters('env'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('spBackName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "sp back"
+      },
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "name": "[variables('spBackName')]"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('webSiteBackName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('spBackName'))]": "Resource",
+        "displayName": "back"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms/', variables('spBackName'))]"
+      ],
+      "properties": {
+        "name": "[variables('webSiteBackName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('spBackName'))]"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('spFrontName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "sp front"
+      },
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "name": "[variables('spFrontName')]"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('webSiteFrontName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('spFrontName'))]": "Resource",
+        "displayName": "front"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms/', variables('spFrontName'))]"
+      ],
+      "properties": {
+        "name": "[variables('webSiteFrontName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('spFrontName'))]"
+      }
+    }
+  ]
+}
