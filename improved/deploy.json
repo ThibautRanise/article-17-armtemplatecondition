@@ -54,7 +54,7 @@
   },
   "resources": [
     {
-      "condition": "[equals(parameters('env'),'dev')]",
+      "condition": "[not(equals(parameters('env'),'prod'))]",
       "apiVersion": "2015-08-01",
       "name": "[variables('spSharedName')]",
       "type": "Microsoft.Web/serverfarms",
@@ -70,7 +70,7 @@
       }
     },
     {
-      "condition": "[not(equals(parameters('env'),'dev'))]",
+      "condition": "[equals(parameters('env'),'prod')]",
       "apiVersion": "2015-08-01",
       "name": "[variables('spBackName')]",
       "type": "Microsoft.Web/serverfarms",
@@ -86,7 +86,7 @@
       }
     },
     {
-      "condition": "[not(equals(parameters('env'),'dev'))]",
+      "condition": "[equals(parameters('env'),'prod')]",
       "apiVersion": "2015-08-01",
       "name": "[variables('spFrontName')]",
       "type": "Microsoft.Web/serverfarms",
